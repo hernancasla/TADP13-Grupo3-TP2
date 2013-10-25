@@ -3,6 +3,7 @@ require_relative 'join_point'
 require_relative 'advice'
 
 class AdviceTransaccion
+  attr_accessor :autocommit
 
   def initialize(objeto)
     @objeto = objeto
@@ -36,6 +37,14 @@ class AdviceTransaccion
     point_cut = JoinPointMetodosAccessors.new(@objeto.class).y(JoinPointNombreMetodo.new(/^(\w+)=$/))
 
     motor.aspecto(point_cut,advice,@objeto.singleton_class)
+
+    if(@autocommit)
+      advice = AdviceDespues.new(Proc.new{puts 'advice despues'})
+
+      point_cut = JoinPointMetodosAccessors.new(@objeto.class).y(JoinPointNombreMetodo.new(/^(\w+)=$/))
+
+      motor.aspecto(point_cut,advice,@objeto.singleton_class)
+    end
 
   end
 
